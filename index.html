@@ -88,6 +88,14 @@
             background: linear-gradient(to bottom, #dcdcdc, #b8b8b8);
         }
 
+.input-group input[placeholder="Account Balance"] + span {
+    padding: 10px 19px; /* Increase left padding */
+}
+
+.input-group input[placeholder="Risk Percentage"] + span {
+    padding: 10px 16px; /* Adjust as needed */
+}
+
         .notification {
             position: fixed;
             bottom: 50px;
@@ -147,6 +155,7 @@
             <input type="number" id="balance_xau" placeholder="Account Balance">
             <span>$</span>
         </div>
+        
         <div class="input-group">
             <input type="number" id="risk_xau" placeholder="Risk Percentage">
             <span>%</span>
