@@ -185,10 +185,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Restore saved values from local storage
     document.getElementById("balance_eur").value = localStorage.getItem("balance_eur") || "";
     document.getElementById("risk_eur").value = localStorage.getItem("risk_eur") || "";
-    document.getElementById("stopLoss_eur").value = localStorage.getItem("stopLoss_eur") || "";
+    document.getElementById("stopLoss_eur").value = ""; // Default to empty
     document.getElementById("balance_xau").value = localStorage.getItem("balance_xau") || "";
     document.getElementById("risk_xau").value = localStorage.getItem("risk_xau") || "";
-    document.getElementById("stopLoss_xau").value = localStorage.getItem("stopLoss_xau") || "";
+    document.getElementById("stopLoss_xau").value = ""; // Default to empty
 
     // Set default lot size text
     document.getElementById("result_eur").innerText = "Recommended Lot Size: 0 lots";
