@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lot Size Calculator</title>
+        <link rel="icon" type="image/png" href="lscicon.png">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Tahoma&display=swap');
+
+
+    body {
+    font-family: 'Tahoma', sans-serif;
+    text-align: center;
+    background: url('wxp.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 50px;
+    width: 90%;
+    max-width: 1200px;
+    margin-top: 10%;
+    
+}
+
+.calculator {
+    width: 100%;
+    max-width: 350px;
+    background: #d4e4f7; /* Light XP blue */
+    border: 2px solid #1c4b82;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+    
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #1c4b82;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    font-size: 16px;
+    color: black;
+    text-align: center;
+    outline: none;
+    
+}
+
+.input-group span {
+    padding: 10px;
+    font-size: 16px;
+    color: black;
+    text-align: center;
+}
+
+input, select, button {
+    padding: 12px;
+    width: 100%;
+    border: 2px solid #1c4b82;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    background: white;
+    color: black;
+    outline: none;
+    font-weight: bold;
+}
+
+button {
+    cursor: pointer;
+    background: linear-gradient(to bottom, #f3f3f3, #dcdcdc);
+    border: 2px solid #1c4b82;
+    transition: 0.3s ease;
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.8), inset 2px 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background: linear-gradient(to bottom, #dcdcdc, #b8b8b8);
+}
+
+.notification {
+    position: fixed;
+    bottom: 50px;
+    
+    background: #ffffe1; /* Light yellow XP-style tooltip background */
+    color: black;
+    padding: 10px 20px;
+    border: 2px solid #1c4b82; /* XP blue border */
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Tahoma', sans-serif;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow like XP popups */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                body {
+                    height: auto;
+                    padding: 20px;
+                }
+                .container {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 30px;
+                }
+                .calculator {
+                    width: 90%;
+                    max-width: 400px;
+                }
+            }
+        </style>
+    </head>
+ 
+    <div class="container">
+        <div class="calculator">
+            <h2>EUR/USD</h2>
+            <div class="input-group">
+                <input type="number" id="balance_eur" placeholder="Account Balance" />
+                <span>$</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="risk_eur" placeholder="Risk Percentage" />
+                <span>%</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="stopLoss_eur" placeholder="Stop Loss" />
+                <span>Pips</span>
+            </div>
+            <button onclick="calculateLotSize('eur')">Calculate</button>
+            <h3 id="result_eur"></h3>
+            <button onclick="copyResult('result_eur')">Copy Lot Size</button>
+        </div>
+        
+        <div class="calculator">
+            <h2>XAU/USD</h2>
+            <div class="input-group">
+                <input type="number" id="balance_xau" placeholder="Account Balance" />
+                <span>$</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="risk_xau" placeholder="Risk Percentage" />
+                <span>%</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="stopLoss_xau" placeholder="Stop Loss" />
+                <span>Pips</span>
+            </div>
+            <button onclick="calculateLotSize('xau')">Calculate</button>
+            <h3 id="result_xau"></h3>
+            <button onclick="copyResult('result_xau')">Copy Lot Size</button>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Restore saved values from local storage
+    document.getElementById("balance_eur").value = localStorage.getItem("balance_eur") || "";
+    document.getElementById("risk_eur").value = localStorage.getItem("risk_eur") || "";
+    document.getElementById("stopLoss_eur").value = localStorage.getItem("stopLoss_eur") || "";
+    document.getElementById("balance_xau").value = localStorage.getItem("balance_xau") || "";
+    document.getElementById("risk_xau").value = localStorage.getItem("risk_xau") || "";
+    document.getElementById("stopLoss_xau").value = localStorage.getItem("stopLoss_xau") || "";
+
+    // Set default lot size text
+    document.getElementById("result_eur").innerText = "Recommended Lot Size: 0 lots";
+    document.getElementById("result_xau").innerText = "Recommended Lot Size: 0 lots";
+});
+
+function calculateLotSize(pair) {
+    let balance = parseFloat(document.getElementById("balance_" + pair).value);
+    let risk = parseFloat(document.getElementById("risk_" + pair).value);
+    let stopLoss = parseFloat(document.getElementById("stopLoss_" + pair).value);
+
+    if (isNaN(balance) || isNaN(risk) || isNaN(stopLoss) || balance <= 0 || risk <= 0 || stopLoss <= 0) {
+        document.getElementById("result_" + pair).innerText = "Recommended Lot Size: 0 lots";
+        return;
+    }
+
+    let riskAmount = (risk / 100) * balance;
+    let pipValue = pair === "eur" ? 10 : 1;
+    let lotSize = riskAmount / (stopLoss * pipValue);
+    
+    document.getElementById("result_" + pair).innerText = "Recommended Lot Size: " + lotSize.toFixed(2) + " lots";
+
+    // Save values to local storage
+    localStorage.setItem("balance_" + pair, document.getElementById("balance_" + pair).value);
+    localStorage.setItem("risk_" + pair, document.getElementById("risk_" + pair).value);
+    localStorage.setItem("stopLoss_" + pair, document.getElementById("stopLoss_" + pair).value);
+}
+
+
+        function copyResult(resultId) {
+            const resultText = document.getElementById(resultId).innerText;
+            const lotSize = resultText.match(/\d+\.\d+/);
+            if (lotSize) {
+                navigator.clipboard.writeText(lotSize[0]);
+                let notification = document.getElementById("notification");
+                notification.innerText = lotSize[0] + " copied";
+                notification.classList.add("show");
+                setTimeout(() => notification.classList.remove("show"), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
