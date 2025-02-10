@@ -96,6 +96,18 @@
     padding: 10px 16px; /* Adjust as needed */
 }
 
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+    background: white;
+    text-align: center;
+    cursor: pointer;
+}
+
+
         .notification {
             position: fixed;
             bottom: 50px;
@@ -134,7 +146,15 @@
     <div class="calculator">
         <h2>EUR/USD</h2>
         <div class="input-group">
-            <input type="number" id="balance_eur" placeholder="Account Balance">
+            <select id="balance_eur" onchange="syncBalance(this.value, 'eur')">
+                <option value="25000">25,000</option>
+                <option value="50000">50,000</option>
+                <option value="100000">100,000</option>
+                <option value="200000">200,000</option>
+                
+            </select>
+            <input type="number" id="custom_balance_eur" class="custom-input" placeholder="Enter custom balance" 
+                   oninput="syncCustomBalance(this.value, 'eur')" style="display: none;">
             <span>$</span>
         </div>
         <div class="input-group">
@@ -152,7 +172,14 @@
     <div class="calculator">
         <h2>XAU/USD</h2>
         <div class="input-group">
-            <input type="number" id="balance_xau" placeholder="Account Balance">
+            <select id="balance_xau" onchange="syncBalance(this.value, 'xau')">
+                <option value="25000">25,000</option>
+                <option value="50000">50,000</option>
+                <option value="100000">100,000</option>
+                <option value="200000">200,000</option>
+            </select>
+            <input type="number" id="custom_balance_xau" class="custom-input" placeholder="Enter custom balance" 
+                   oninput="syncCustomBalance(this.value, 'xau')" style="display: none;">
             <span>$</span>
         </div>
         
@@ -171,7 +198,60 @@
 
 <div id="notification" class="notification"></div>
 
-<script>
+<script> 
+
+document.addEventListener("DOMContentLoaded", function () {
+    ["eur", "xau"].forEach(pair => {
+
+
+        const balanceElement = document.getElementById("balance_" + pair);
+        const savedBalance = localStorage.getItem("balance_" + pair);
+        if (savedBalance) {
+            balanceElement.value = savedBalance;
+        }
+
+        balanceElement.addEventListener("change", function () {
+            localStorage.setItem("balance_" + pair, this.value);
+            calculateLotSize(pair);
+        });
+    });
+
+    document.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", function () {
+            let pair = this.id.includes("eur") ? "eur" : "xau";
+            calculateLotSize(pair);
+        });
+    });
+});
+
+function handleBalanceChange(selectElement, pair) {
+    let customInput = document.getElementById("custom_balance_" + pair);
+
+    if (selectElement.value === "custom") {
+        customInput.style.display = "inline-block";
+        customInput.focus();
+    } else {
+        customInput.style.display = "none";
+        syncBalance(selectElement.value, pair);
+    }
+}
+
+
+
+function syncBalance(value, changedPair) {
+    let otherPair = changedPair === "eur" ? "xau" : "eur";
+
+    document.getElementById("balance_" + otherPair).value = value;
+    localStorage.setItem("balance_eur", value);
+    localStorage.setItem("balance_xau", value);
+
+    calculateLotSize("eur");
+    calculateLotSize("xau");
+}
+
+
+    
+
 document.addEventListener("DOMContentLoaded", function () {
     // Restore saved values from local storage
     document.getElementById("balance_eur").value = localStorage.getItem("balance_eur") || "";
@@ -193,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function calculateLotSize(pair) {
-    let balance = parseFloat(document.getElementById("balance_" + pair).value);
+    let balance = parseFloat(document.getElementById("balance_" + pair).value) || 0;
     let risk = parseFloat(document.getElementById("risk_" + pair).value);
     let stopLoss = parseFloat(document.getElementById("stopLoss_" + pair).value);
 
