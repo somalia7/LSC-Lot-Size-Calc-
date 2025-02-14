@@ -202,16 +202,25 @@ select {
 
 document.addEventListener("DOMContentLoaded", function () {
     ["eur", "xau"].forEach(pair => {
-
-
         const balanceElement = document.getElementById("balance_" + pair);
         const savedBalance = localStorage.getItem("balance_" + pair);
         if (savedBalance) {
             balanceElement.value = savedBalance;
         }
 
+        const riskElement = document.getElementById("risk_" + pair);
+        const savedRisk = localStorage.getItem("risk_" + pair);
+        if (savedRisk) {
+            riskElement.value = savedRisk;
+        }
+
         balanceElement.addEventListener("change", function () {
             localStorage.setItem("balance_" + pair, this.value);
+            calculateLotSize(pair);
+        });
+
+        riskElement.addEventListener("change", function () {
+            localStorage.setItem("risk_" + pair, this.value);
             calculateLotSize(pair);
         });
     });
@@ -236,8 +245,6 @@ function handleBalanceChange(selectElement, pair) {
     }
 }
 
-
-
 function syncBalance(value, changedPair) {
     let otherPair = changedPair === "eur" ? "xau" : "eur";
 
@@ -249,33 +256,14 @@ function syncBalance(value, changedPair) {
     calculateLotSize("xau");
 }
 
-
-    
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Restore saved values from local storage
-    document.getElementById("balance_eur").value = localStorage.getItem("balance_eur") || "";
-    document.getElementById("risk_eur").value = localStorage.getItem("risk_eur") || "";
-    document.getElementById("balance_xau").value = localStorage.getItem("balance_xau") || "";
-    document.getElementById("risk_xau").value = localStorage.getItem("risk_xau") || "";
-
-    // Set default lot size text
-    document.getElementById("result_eur").innerText = "Recommended Lot Size: 0 lots";
-    document.getElementById("result_xau").innerText = "Recommended Lot Size: 0 lots";
-
-    // Add event listeners to input fields for live updates
-    document.querySelectorAll("input").forEach(input => {
-        input.addEventListener("input", function () {
-            let pair = this.id.includes("eur") ? "eur" : "xau";
-            calculateLotSize(pair);
-        });
-    });
-});
-
 function calculateLotSize(pair) {
     let balance = parseFloat(document.getElementById("balance_" + pair).value) || 0;
     let risk = parseFloat(document.getElementById("risk_" + pair).value);
     let stopLoss = parseFloat(document.getElementById("stopLoss_" + pair).value);
+
+    if (pair === "eur") {
+        stopLoss = stopLoss / 10; // Convert input to correct decimal format only for EUR/USD
+    }
 
     if (isNaN(balance) || isNaN(risk) || isNaN(stopLoss) || balance <= 0 || risk <= 0 || stopLoss <= 0) {
         document.getElementById("result_" + pair).innerText = "Recommended Lot Size: 0 lots";
@@ -288,15 +276,14 @@ function calculateLotSize(pair) {
 
     document.getElementById("result_" + pair).innerText = "Recommended Lot Size: " + lotSize.toFixed(2) + " lots";
 
-    // Save only balance and risk to local storage
+    // Save balance and risk to local storage
     localStorage.setItem("balance_" + pair, document.getElementById("balance_" + pair).value);
     localStorage.setItem("risk_" + pair, document.getElementById("risk_" + pair).value);
 }
 
-
 function copyResult(resultId) {
     const resultText = document.getElementById(resultId).innerText;
-    const lotSize = resultText.match(/\d+\.\d+/);
+    const lotSize = resultText.match(/\d+/); // Extract whole number
     if (lotSize) {
         navigator.clipboard.writeText(lotSize[0]);
         let notification = document.getElementById("notification");
@@ -305,6 +292,8 @@ function copyResult(resultId) {
         setTimeout(() => notification.classList.remove("show"), 2000);
     }
 }
+
+
 
 </script>
 
