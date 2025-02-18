@@ -88,24 +88,23 @@
             background: linear-gradient(to bottom, #dcdcdc, #b8b8b8);
         }
 
-.input-group input[placeholder="Account Balance"] + span {
-    padding: 10px 19px; /* Increase left padding */
-}
+        .input-group input[placeholder="Account Balance"] + span {
+            padding: 10px 19px; /* Increase left padding */
+        }
 
-.input-group input[placeholder="Risk Percentage"] + span {
-    padding: 10px 16px; /* Adjust as needed */
-}
+        .input-group input[placeholder="Risk Percentage"] + span {
+            padding: 10px 16px; /* Adjust as needed */
+        }
 
-select {
-    width: 100%;
-    font-size: 16px;
-    border: 2px solid #ffffff;
-    border-radius: 10px;
-    background: white;
-    text-align: center;
-    cursor: pointer;
-}
-
+        select {
+            width: 100%;
+            font-size: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+        }
 
         .notification {
             position: fixed;
@@ -171,6 +170,7 @@ select {
             <span>Pips</span>
         </div>
         <h3 id="result_eur">Recommended Lot Size: 0 lots</h3>
+        <h3 id="riskAmount_eur">Risk Amount: $0</h3>
         <button onclick="copyResult('result_eur')">Copy Lot Size</button>
     </div>
     
@@ -204,6 +204,7 @@ select {
             <span>Pips</span>
         </div>
         <h3 id="result_xau">Recommended Lot Size: 0 lots</h3>
+        <h3 id="riskAmount_xau">Risk Amount: $0</h3>
         <button onclick="copyResult('result_xau')">Copy Lot Size</button>
     </div>
 </div>
@@ -316,6 +317,7 @@ function calculateLotSize(pair) {
 
     if (isNaN(balance) || isNaN(risk) || isNaN(stopLoss) || balance <= 0 || risk <= 0 || stopLoss <= 0) {
         document.getElementById("result_" + pair).innerText = "Recommended Lot Size: 0 lots";
+        document.getElementById("riskAmount_" + pair).innerText = "Risk Amount: $0";
         return;
     }
 
@@ -324,6 +326,7 @@ function calculateLotSize(pair) {
     let lotSize = riskAmount / (stopLoss * pipValue);
 
     document.getElementById("result_" + pair).innerText = "Recommended Lot Size: " + lotSize.toFixed(2) + " lots";
+    document.getElementById("riskAmount_" + pair).innerText = "Risk Amount: $" + riskAmount.toFixed(2);
 
     // Save balance and risk to local storage
     localStorage.setItem("balance_" + pair, balanceElement.value === "custom" ? "custom" : balanceElement.value);
@@ -347,3 +350,5 @@ function copyResult(resultId) {
     }
 }
 </script>
+</body>
+</html>
