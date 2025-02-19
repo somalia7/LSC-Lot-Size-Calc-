@@ -326,7 +326,7 @@ function calculateLotSize(pair) {
     let lotSize = riskAmount / (stopLoss * pipValue);
 
     document.getElementById("result_" + pair).innerText = "Recommended Lot Size: " + lotSize.toFixed(2) + " lots";
-    document.getElementById("riskAmount_" + pair).innerText = "Risk Amount: $" + riskAmount.toFixed(2);
+    document.getElementById("riskAmount_" + pair).innerText = "Risk Amount: $" + riskAmount.toFixed(0);
 
     // Save balance and risk to local storage
     localStorage.setItem("balance_" + pair, balanceElement.value === "custom" ? "custom" : balanceElement.value);
